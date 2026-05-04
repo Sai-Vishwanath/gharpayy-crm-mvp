@@ -1,6 +1,7 @@
 import sqlite3
 import pandas as pd
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 
 DB_NAME = 'crm.db'
 
@@ -37,6 +38,22 @@ def init_db():
     cursor.execute('SELECT COUNT(*) FROM agents')
     if cursor.fetchone()[0] == 0:
         cursor.executemany('INSERT INTO agents (name) VALUES (?)', [('Rahul',), ('Priya',), ('Amit',)])
+        
+    cursor.execute('SELECT COUNT(*) FROM leads')
+    if cursor.fetchone()[0] == 0:
+        dummy_leads = [
+            ('Aarav Sharma', '+91 9876543210', 'Koramangala Phase 1', (datetime.now() + timedelta(days=5)).strftime('%Y-%m-%d'), 'New', random.choice([1, 2, 3]), None),
+            ('Diya Patel', '+91 9123456789', 'Indiranagar 100ft', (datetime.now() + timedelta(days=12)).strftime('%Y-%m-%d'), 'Contacted', random.choice([1, 2, 3]), None),
+            ('Rohan Gupta', '+91 9988776655', 'HSR Layout Sector 2', (datetime.now() + timedelta(days=2)).strftime('%Y-%m-%d'), 'Visit Scheduled', random.choice([1, 2, 3]), (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')),
+            ('Ananya Singh', '+91 9871234560', 'Whitefield Main', (datetime.now() + timedelta(days=15)).strftime('%Y-%m-%d'), 'Won', random.choice([1, 2, 3]), (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')),
+            ('Vikram Reddy', '+91 9012345678', 'BTM Layout Stage 2', (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'), 'Contacted', random.choice([1, 2, 3]), None),
+            ('Neha Kumar', '+91 9345678901', 'Koramangala Phase 1', (datetime.now() + timedelta(days=20)).strftime('%Y-%m-%d'), 'Visit Scheduled', random.choice([1, 2, 3]), (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d'))
+        ]
+        
+        cursor.executemany('''
+            INSERT INTO leads (name, phone, pg_location, move_in_date, status, agent_id, visit_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', dummy_leads)
         
     conn.commit()
     conn.close()
